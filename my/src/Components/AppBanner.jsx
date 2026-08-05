@@ -2,30 +2,39 @@
 function AppBanner() {
   return (
     <section className="bg-[#f8fafc] py-8">
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-[#06164A] via-[#071A52] to-[#3B1FA5] px-8 py-8 lg:px-10 lg:py-8 min-h-[220px]">
+        <div
+          className="-mx-4 sm:mx-0
+                     relative overflow-hidden
+                     rounded-none sm:rounded-[28px]
+                     bg-gradient-to-r from-[#06164A] via-[#071A52] to-[#3B1FA5]
+                     px-5 py-8
+                     sm:px-8 sm:py-8
+                     lg:px-10 lg:py-8
+                     min-h-[220px]"
+        >
 
           {/* Purple Glow */}
           <div className="absolute -right-20 -bottom-20 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl"></div>
 
-          <div className="relative z-10 grid lg:grid-cols-[1fr_auto_1fr] items-center gap-8 h-full">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-center gap-8 h-full">
 
             {/* LEFT */}
-            <div>
+            <div className="text-center lg:text-left">
               <h2 className="text-2xl lg:text-3xl font-bold leading-tight text-white">
                 Manage your deliveries<br />
                 on the go.
               </h2>
 
-              <p className="mt-3 text-sm text-indigo-100 leading-6 max-w-xs">
+              <p className="mt-3 text-sm text-indigo-100 leading-6 max-w-xs mx-auto lg:mx-0">
                 Download the Velora Logistics app and enjoy a seamless
                 delivery experience.
               </p>
             </div>
 
             {/* CENTER */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
 
               {/* QR */}
               <div className="bg-white p-2 rounded-xl shadow-lg">
@@ -37,11 +46,11 @@ function AppBanner() {
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
 
                 <a
                   href="#"
-                  className="bg-black rounded-lg px-3 py-2 flex items-center justify-center border border-white/10 hover:bg-gray-900 transition w-[150px]"
+                  className="bg-black rounded-lg px-3 py-2 flex items-center justify-center border border-white/10 hover:bg-gray-900 transition w-full sm:w-[150px]"
                 >
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
@@ -52,7 +61,7 @@ function AppBanner() {
 
                 <a
                   href="#"
-                  className="bg-black rounded-lg px-3 py-2 flex items-center justify-center border border-white/10 hover:bg-gray-900 transition w-[150px]"
+                  className="bg-black rounded-lg px-3 py-2 flex items-center justify-center border border-white/10 hover:bg-gray-900 transition w-full sm:w-[150px]"
                 >
                   <img
                     src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
@@ -64,10 +73,10 @@ function AppBanner() {
             </div>
 
             {/* RIGHT PHONES */}
-            <div className="relative h-[260px] md:h-[300px] lg:h-[220px] flex justify-center lg:justify-end mt-8 lg:mt-0">
+            <div className="relative flex h-[260px] md:h-[300px] lg:h-[220px] justify-center lg:justify-end mt-6 lg:mt-0">
 
               {/* Back Phone */}
-              <div className="absolute right-28 top-10 w-36 h-[240px] rounded-[28px] bg-[#0B2A78] border-4 border-[#1D4ED8] shadow-2xl rotate-[-10deg] overflow-hidden">
+              <div className="hidden sm:block absolute right-24 top-10 w-36 h-[240px] rounded-[28px] bg-[#0B2A78] border-4 border-[#1D4ED8] shadow-2xl rotate-[-10deg] overflow-hidden">
                 <div className="h-full bg-white p-3 flex flex-col">
                   <div className="text-[10px] font-semibold text-slate-900">
                     Hello, John 👋
@@ -86,14 +95,14 @@ function AppBanner() {
                     </div>
                     <div className="flex items-center gap-2 text-[10px] text-slate-700">
                       <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                      Abuja Hub
+                      Geneva Hub
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Front Phone */}
-              <div className="absolute right-0 top-0 w-40 h-[255px] rounded-[30px] bg-[#0B2A78] border-4 border-[#2563EB] shadow-2xl rotate-[6deg] overflow-hidden">
+              <div className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 top-0 w-40 h-[255px] rounded-[30px] bg-[#0B2A78] border-4 border-[#2563EB] shadow-2xl rotate-[4deg] sm:rotate-[6deg] overflow-hidden">
                 <div className="h-full bg-white p-3 flex flex-col">
 
                   <div className="text-xs font-semibold text-slate-900">
@@ -132,13 +141,13 @@ function AppBanner() {
                       Estimated Arrival
                     </p>
                     <p className="text-xs font-semibold text-slate-900 mt-1">
-                      Tomorrow, 10:00 AM
+                      Tomorrow, 10:00 CEST
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -147,4 +156,3 @@ function AppBanner() {
 }
 
 export default AppBanner;
-

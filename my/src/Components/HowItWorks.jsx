@@ -40,21 +40,21 @@ function HowItWorks() {
 
   return (
     <section className="bg-[#f8fafc] pt-16 pb-10">
-      <div className="max-w-7xl mx-auto px-8">
+      {/* OUTER WRAPPER */}
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
+        {/* TITLE */}
+        <div className="px-4 sm:px-0">
+          <h2 className="text-3xl font-bold text-slate-900">
+            How It Works
+          </h2>
+        </div>
 
-        {/* Section Title */}
-        <h2 className="text-3xl font-bold text-slate-900">
-          How It Works
-        </h2>
-
-        {/* Main Layout */}
+        {/* MAIN LAYOUT */}
         <div className="mt-12 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-start">
-
           {/* LEFT SIDE - STEPS */}
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-8 px-4 sm:px-0">
             {steps.map((step, index) => (
               <div key={index} className="relative text-center">
-
                 {/* Arrow Connector */}
                 {index % 2 === 0 && index !== steps.length - 1 && (
                   <div className="hidden md:flex absolute top-10 -right-5 items-center justify-center text-gray-300">
@@ -86,18 +86,21 @@ function HowItWorks() {
             ))}
           </div>
 
-          {/* RIGHT SIDE - SPLIT MAP PANEL */}
-          <div className="bg-[#071A52] rounded-3xl p-5 text-white relative overflow-hidden shadow-2xl w-full min-h-[420px] md:min-h-[380px] lg:min-h-[400px]">
-
-            <div className="grid grid-cols-[1.2fr_0.8fr] gap-4 items-start">
-
+          {/* RIGHT SIDE - MAP PANEL */}
+          <div
+            className="w-full bg-[#071A52]
+                       rounded-none sm:rounded-3xl
+                       p-5 sm:p-6 text-white
+                       relative overflow-hidden shadow-2xl
+                       min-h-[420px] md:min-h-[380px] lg:min-h-[400px]"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 items-start">
               {/* LEFT - MAP AREA */}
               <div className="bg-[#0B2A78] rounded-2xl p-4 relative min-h-[380px] md:min-h-[340px] lg:min-h-[360px] overflow-hidden flex items-center justify-center">
-
                 {/* Route Line */}
                 <div className="absolute top-14 left-10 w-[65%] h-[2px] border-t-2 border-dashed border-indigo-400 rotate-12"></div>
 
-                {/* poland Card */}
+                {/* Poznań Card */}
                 <div className="absolute top-6 left-5 bg-white rounded-lg px-3 py-2 text-slate-900 shadow-lg">
                   <p className="font-semibold text-[11px] text-center">
                     Poznań Hub
@@ -107,7 +110,7 @@ function HowItWorks() {
                   </p>
                 </div>
 
-                {/* Lagos Card */}
+                {/* Warsaw Card */}
                 <div className="absolute bottom-8 left-16 bg-white rounded-lg px-3 py-2 text-slate-900 shadow-lg">
                   <p className="font-semibold text-[11px] text-center">
                     Warsaw Hub
@@ -131,7 +134,6 @@ function HowItWorks() {
 
               {/* RIGHT - TRACKING TIMELINE */}
               <div className="bg-[#0A1F5C] rounded-2xl p-4 flex flex-col justify-between min-h-[380px] md:min-h-[340px] lg:min-h-[360px]">
-
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold">Live Tracking</h3>
@@ -140,8 +142,6 @@ function HowItWorks() {
 
                 {/* Timeline */}
                 <div className="space-y-4">
-
-                  {/* Shipment Created */}
                   <div className="flex items-start gap-3">
                     <div className="w-3 h-3 rounded-full bg-green-500 mt-1"></div>
                     <div>
@@ -154,7 +154,6 @@ function HowItWorks() {
                     </div>
                   </div>
 
-                  {/* Picked Up */}
                   <div className="flex items-start gap-3">
                     <div className="w-3 h-3 rounded-full bg-green-500 mt-1"></div>
                     <div>
@@ -167,7 +166,6 @@ function HowItWorks() {
                     </div>
                   </div>
 
-                  {/* In Transit */}
                   <div className="flex items-start gap-3">
                     <div className="w-3 h-3 rounded-full bg-green-500 mt-1 animate-pulse"></div>
                     <div>
@@ -180,7 +178,6 @@ function HowItWorks() {
                     </div>
                   </div>
 
-                  {/* Arrival at Hub */}
                   <div className="flex items-start gap-3 opacity-80">
                     <div className="w-3 h-3 rounded-full bg-blue-400 mt-1"></div>
                     <div>
@@ -193,7 +190,6 @@ function HowItWorks() {
                     </div>
                   </div>
 
-                  {/* Out for Delivery */}
                   <div className="flex items-start gap-3 opacity-70">
                     <div className="w-3 h-3 rounded-full bg-yellow-400 mt-1"></div>
                     <div>
@@ -206,7 +202,6 @@ function HowItWorks() {
                     </div>
                   </div>
 
-                  {/* Delivered */}
                   <div className="flex items-start gap-3 opacity-60">
                     <div className="w-3 h-3 rounded-full bg-gray-400 mt-1"></div>
                     <div>
@@ -226,7 +221,7 @@ function HowItWorks() {
                     Estimated Arrival
                   </p>
                   <p className="text-sm font-semibold text-white mt-1">
-                    Tomorrow . 10:00 CEST
+                    Tomorrow • 10:00 CEST
                   </p>
                 </div>
               </div>
@@ -239,5 +234,3 @@ function HowItWorks() {
 }
 
 export default HowItWorks;
-
-
