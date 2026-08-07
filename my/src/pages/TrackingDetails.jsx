@@ -1,125 +1,144 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
-function Tracking() {
+function TrackingDetails() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [shipment, setShipment] = useState(null);
   const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleTrack = () => {
+  const handleTrack = async (e) => {
+    e.preventDefault();
+
+    if (!trackingNumber.trim()) return;
+
+    setLoading(true);
     setSearched(true);
 
-    if (trackingNumber.trim().toUpperCase() === "VLS284738") {
-      setShipment({
-        id: "VLS284738",
-        status: "In Transit",
-        location: "Geneva Distribution Hub",
-        destination: "Aarhus Hub",
-        arrival: "Tomorrow at 11:32 CEST",
-      });
-    } else {
+    const { data, error } = await supabase
+      .from("shipments")
+      .select("*")
+      .eq("tracking_number", trackingNumber.trim().toUpperCase())
+      .single();
+
+    if (error || !data) {
       setShipment(null);
+    } else {
+      setShipment(data);
     }
+
+    setLoading(false);
   };
 
   return (
-    <section className="min-h-screen bg-slate-50 px-6 py-20">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-16 px-4">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+        <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">
+          Track Your Shipment
+        </h1>
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-slate-900">
-            Track Your Shipment
-          </h1>
-          <p className="mt-4 text-slate-600">
-            Enter your tracking number to get the latest shipment updates.
-          </p>
-        </div>
+        <p className="text-gray-500 text-center mb-8">
+          Enter your tracking number to get real-time shipment updates.
+        </p>
 
-        {/* Tracking Box */}
-        <div className="bg-white rounded-3xl shadow-lg p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              value={trackingNumber}
-              onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder="Enter tracking number (try VLS284738)"
-              className="flex-1 px-4 py-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+        <form
+          onSubmit={handleTrack}
+          className="flex flex-col sm:flex-row gap-4"
+        >
+          <input
+            type="text"
+            value={trackingNumber}
+            onChange={(e) => setTrackingNumber(e.target.value)}
+            placeholder="Enter tracking number (e.g. VLS284738)"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+          />
 
-            <button
-              onClick={handleTrack}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-xl font-semibold transition whitespace-nowrap"
-            >
-              Track Shipment
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-6 py-3 rounded-lg font-medium transition"
+          >
+            {loading ? "Tracking..." : "Track"}
+          </button>
+        </form>
 
-          {/* Results */}
-          {shipment && (
-            <div className="mt-8 rounded-2xl border border-green-100 bg-green-50 p-6">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <h2 className="text-xl font-bold text-slate-900">
+        {/* Shipment Found */}
+        {searched && shipment && (
+          <div className="mt-8 border border-green-200 bg-green-50 rounded-xl p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">
                   Shipment Found
                 </h2>
-                <span className="rounded-full bg-green-100 text-green-700 px-3 py-1 text-sm font-semibold">
-                  {shipment.status}
-                </span>
+                <p className="text-gray-600 text-sm">
+                  Tracking ID: {shipment.tracking_number}
+                </p>
               </div>
 
-              <div className="mt-6 grid sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-slate-500">Tracking Number</p>
-                  <p className="font-semibold text-slate-900">
-                    {shipment.id}
-                  </p>
-                </div>
+              <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full w-fit">
+                {shipment.status}
+              </span>
+            </div>
 
-                <div>
-                  <p className="text-slate-500">Current Location</p>
-                  <p className="font-semibold text-slate-900">
-                    {shipment.location}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-slate-500">Destination</p>
-                  <p className="font-semibold text-slate-900">
-                    {shipment.destination}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-slate-500">Estimated Arrival</p>
-                  <p className="font-semibold text-slate-900">
-                    {shipment.arrival}
-                  </p>
-                </div>
+            <div className="grid sm:grid-cols-2 gap-4 text-sm">
+              <div className="border border-gray-200 rounded-xl bg-white p-4">
+                <p className="text-gray-500 mb-1">Current Location</p>
+                <p className="font-medium text-slate-900">
+                  {shipment.location || "Not available"}
+                </p>
               </div>
 
-              <Link
-                to="/tracking-details"
-                className="mt-6 inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl font-semibold transition"
-              >
-                View Full Journey →
-              </Link>
-            </div>
-          )}
+              <div className="border border-gray-200 rounded-xl bg-white p-4">
+                <p className="text-gray-500 mb-1">Destination</p>
+                <p className="font-medium text-slate-900">
+                  {shipment.destination || "Not available"}
+                </p>
+              </div>
 
-          {searched && !shipment && (
-            <div className="mt-8 rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
-              <p className="font-semibold text-red-700">
-                Tracking number not found.
-              </p>
-              <p className="mt-2 text-sm text-red-600">
-                Try using <span className="font-semibold">VLS284738</span> for the demo.
-              </p>
+              <div className="border border-gray-200 rounded-xl bg-white p-4">
+                <p className="text-gray-500 mb-1">Expected Delivery</p>
+                <p className="font-medium text-slate-900">
+                  {shipment.arrival || "Not available"}
+                </p>
+              </div>
+
+              <div className="border border-gray-200 rounded-xl bg-white p-4">
+                <p className="text-gray-500 mb-1">Last Updated</p>
+                <p className="font-medium text-slate-900">
+                  {shipment.created_at
+                    ? new Date(shipment.created_at).toLocaleString()
+                    : "Not available"}
+                </p>
+              </div>
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Shipment Not Found */}
+        {searched && !shipment && !loading && (
+          <div className="mt-8 border border-red-200 bg-red-50 rounded-xl p-6 text-center">
+            <h2 className="text-lg font-semibold text-red-700 mb-2">
+              Shipment Not Found
+            </h2>
+
+            <p className="text-red-600 text-sm">
+              We couldn't find any shipment with that tracking number.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-8 text-center">
+          <Link
+            to="/"
+            className="text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            ← Back to Home
+          </Link>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-export default Tracking;
+export default TrackingDetails;
