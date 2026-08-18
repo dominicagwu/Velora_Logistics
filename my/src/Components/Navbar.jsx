@@ -11,39 +11,43 @@ function Navbar() {
   return (
     <>
       <nav className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-5 bg-white shadow-sm relative z-50">
-        {/* Logo */}
+        {/* LOGO */}
         <Link to="/" onClick={closeMenu}>
-          <img src={image} alt="Velora Logistics" className="h-9 w-auto" />
+          <img
+            src={image}
+            alt="Velora Logistics"
+            className="h-9 w-auto"
+          />
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* DESKTOP NAVIGATION */}
         <ul className="hidden lg:flex items-center gap-10">
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/">Home</Link>
           </li>
 
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/about">About</Link>
           </li>
 
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/services">Services</Link>
           </li>
 
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/pricing">Pricing</Link>
           </li>
 
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/tracking">Tracking</Link>
           </li>
 
-          <li className="font-medium text-gray-700 hover:text-indigo-600 transition duration-300">
+          <li className="font-medium text-gray-700 hover:text-indigo-600 transition">
             <Link to="/contact">Contact</Link>
           </li>
         </ul>
 
-        {/* Desktop Phone */}
+        {/* DESKTOP PHONE */}
         <div className="hidden lg:flex items-center gap-3">
           <FaPhoneAlt className="text-indigo-600 text-lg" />
 
@@ -58,23 +62,28 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Desktop Buttons */}
+        {/* DESKTOP BUTTONS */}
         <div className="hidden lg:flex gap-4">
-          <Link to="/login">
-            <button className="border border-gray-300 px-5 py-2 rounded-lg hover:bg-gray-100 transition">
-              Login
-            </button>
+          {/* TRACKING BUTTON - NO LOGIN */}
+          <Link
+            to="/tracking"
+            className="text-slate-700 hover:text-indigo-600 font-medium transition border border-gray-300 px-5 py-2 rounded-lg hover:bg-gray-100"
+          >
+            Tracking Number
           </Link>
 
-          <Link to="/tracking">
-            <button className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-              Get Started
-            </button>
+          {/* GET STARTED */}
+          <Link
+            to="/signup"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition"
+          >
+            Get Started
           </Link>
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* MOBILE MENU BUTTON */}
         <button
+          type="button"
           className="lg:hidden text-2xl text-slate-800"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
@@ -83,10 +92,11 @@ function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="lg:hidden bg-white shadow-lg border-t border-gray-100 px-6 py-6 space-y-5">
-          {/* Navigation Links */}
+          
+          {/* MOBILE NAVIGATION */}
           <div className="flex flex-col gap-4">
             <Link
               to="/"
@@ -137,32 +147,42 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Phone */}
+          {/* MOBILE PHONE */}
           <div className="pt-4 border-t border-gray-200 flex items-center gap-3">
             <FaPhoneAlt className="text-indigo-600" />
+
             <div>
               <p className="font-semibold text-slate-900 text-sm">
                 +49 69 1234 5678
               </p>
+
               <p className="text-gray-500 text-xs">
                 24/7 Support
               </p>
             </div>
           </div>
 
-          {/* Mobile Buttons */}
+          {/* MOBILE BUTTONS */}
           <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
-            <Link to="/login" onClick={closeMenu}>
-              <button className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50 transition">
-                Login
-              </button>
+
+            {/* TRACKING - REPLACES LOGIN */}
+            <Link
+              to="/tracking"
+              onClick={closeMenu}
+              className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50 transition text-center"
+            >
+              Tracking Number
             </Link>
 
-            <Link to="/tracking" onClick={closeMenu}>
-              <button className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 transition">
-                Get Started
-              </button>
+            {/* GET STARTED */}
+            <Link
+              to="/signup"
+              onClick={closeMenu}
+              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 transition text-center"
+            >
+              Get Started
             </Link>
+
           </div>
         </div>
       )}

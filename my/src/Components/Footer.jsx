@@ -153,7 +153,7 @@ function Footer() {
         {/* Bottom */}
         <div className="mt-8 pt-6 border-t border-white/10 text-center text-sm text-indigo-200">
           © 2026 Velora Logistics. All Rights Reserved.
-          <p>Developed by: Nick Uka</p>
+          {/* <p>Developed by: Nick Uka</p> */}
         </div>
       </div>
     </footer>

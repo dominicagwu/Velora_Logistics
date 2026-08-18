@@ -5,6 +5,7 @@ import {
   FaBoxOpen,
 } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa6";
+import LiveWorldMap from "./LiveWorldMap";
 
 function HowItWorks() {
   const steps = [
@@ -39,14 +40,18 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="bg-[#f8fafc] pt-16 pb-10">
-      {/* OUTER WRAPPER */}
-      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* TITLE */}
-        <div className="px-4 sm:px-0">
-          <h2 className="text-3xl font-bold text-slate-900">
+        <div className="text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
             How It Works
           </h2>
+
+          <p className="mt-4 text-lg text-gray-500">
+            A simple four-step process designed to move your shipment from pickup
+            to delivery with full visibility and real-time updates.
+          </p>
         </div>
 
         {/* MAIN LAYOUT */}
@@ -86,7 +91,7 @@ function HowItWorks() {
             ))}
           </div>
 
-          {/* RIGHT SIDE - MAP PANEL */}
+          {/* RIGHT SIDE - LIVE MAP PANEL */}
           <div
             className="w-full bg-[#071A52]
                        rounded-none sm:rounded-3xl
@@ -95,41 +100,9 @@ function HowItWorks() {
                        min-h-[420px] md:min-h-[380px] lg:min-h-[400px]"
           >
             <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4 items-start">
-              {/* LEFT - MAP AREA */}
-              <div className="bg-[#0B2A78] rounded-2xl p-4 relative min-h-[380px] md:min-h-[340px] lg:min-h-[360px] overflow-hidden flex items-center justify-center">
-                {/* Route Line */}
-                <div className="absolute top-14 left-10 w-[65%] h-[2px] border-t-2 border-dashed border-indigo-400 rotate-12"></div>
-
-                {/* Poznań Card */}
-                <div className="absolute top-6 left-5 bg-white rounded-lg px-3 py-2 text-slate-900 shadow-lg">
-                  <p className="font-semibold text-[11px] text-center">
-                    Poznań Hub
-                  </p>
-                  <p className="text-[10px] text-green-600 font-medium text-center">
-                    In Transit
-                  </p>
-                </div>
-
-                {/* Warsaw Card */}
-                <div className="absolute bottom-8 left-16 bg-white rounded-lg px-3 py-2 text-slate-900 shadow-lg">
-                  <p className="font-semibold text-[11px] text-center">
-                    Warsaw Hub
-                  </p>
-                  <p className="text-[10px] text-gray-500 text-center">
-                    Arrives Tomorrow
-                  </p>
-                </div>
-
-                {/* Map Pins */}
-                <div className="absolute top-11 left-[67px] w-4 h-4 bg-indigo-500 rounded-full border-2 border-white shadow-md"></div>
-                <div className="absolute bottom-14 left-[68px] w-4 h-4 bg-indigo-500 rounded-full border-2 border-white shadow-md"></div>
-
-                {/* Decorative Dots */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-6 right-8 w-2 h-2 bg-white rounded-full"></div>
-                  <div className="absolute bottom-6 right-12 w-2 h-2 bg-white rounded-full"></div>
-                  <div className="absolute top-1/2 right-6 w-2 h-2 bg-white rounded-full"></div>
-                </div>
+              {/* LEFT - LIVE WORLD MAP */}
+              <div className="relative h-[380px] md:h-[340px] lg:h-[360px] flex-1 rounded-3xl overflow-hidden bg-blue-950/40">
+                <LiveWorldMap />
               </div>
 
               {/* RIGHT - TRACKING TIMELINE */}
@@ -149,7 +122,7 @@ function HowItWorks() {
                         Shipment Created
                       </p>
                       <p className="text-[10px] text-indigo-200">
-                        10 Jul • 08:20 AM
+                        10 Jul • 08:20 CEST
                       </p>
                     </div>
                   </div>
@@ -161,7 +134,7 @@ function HowItWorks() {
                         Picked Up
                       </p>
                       <p className="text-[10px] text-indigo-200">
-                        Jul • 09:15 CEST
+                        10 Jul • 09:15 CEST
                       </p>
                     </div>
                   </div>
@@ -185,7 +158,7 @@ function HowItWorks() {
                         Arrival at Destination Hub
                       </p>
                       <p className="text-[10px] text-indigo-200">
-                        Jul • 07:30 CEST
+                        11 Jul • 07:30 CEST
                       </p>
                     </div>
                   </div>
