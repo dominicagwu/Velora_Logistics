@@ -28,7 +28,7 @@ function AppBanner() {
               </h2>
 
               <p className="mt-3 text-sm text-indigo-100 leading-6 max-w-xs mx-auto lg:mx-0">
-                Download the Velora Logistics app and enjoy a seamless
+                Download the Velora Freight app and enjoy a seamless
                 delivery experience.
               </p>
             </div>
@@ -79,7 +79,7 @@ function AppBanner() {
               <div className="hidden sm:block absolute right-24 top-10 w-36 h-[240px] rounded-[28px] bg-[#0B2A78] border-4 border-[#1D4ED8] shadow-2xl rotate-[-10deg] overflow-hidden">
                 <div className="h-full bg-white p-3 flex flex-col">
                   <div className="text-[10px] font-semibold text-slate-900">
-                    Hello, John 👋
+                    Hello, Dav 👋
                   </div>
 
                   <div className="mt-3 h-2 bg-gray-200 rounded-full"></div>

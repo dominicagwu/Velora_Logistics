@@ -51,7 +51,7 @@ function WhyChoose() {
 
         {/* Section Title */}
         <h2 className="text-3xl font-bold text-slate-900">
-          Why Choose Velora Logistics?
+          Why Choose Velora Freight?
         </h2>
 
         {/* Feature Row */}

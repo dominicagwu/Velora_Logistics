@@ -9,6 +9,12 @@ import Contact from "./pages/Contact.jsx";
 import Pricing from "./pages/Pricing.jsx";
 import Signup from "./pages/Signup.jsx";
 
+// Service Pages
+import AirFreight from "./pages/services/AirFreight.jsx";
+import OceanFreight from "./pages/services/OceanFreight.jsx";
+import RoadTransport from "./pages/services/RoadTransport.jsx";
+import Warehousing from "./pages/services/Warehousing.jsx";
+
 import AdminLogin from "./pages/AdminLogin.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import CreateShipment from "./pages/CreateShipment.jsx";
@@ -30,23 +36,76 @@ function App() {
 
   return (
     <Routes>
+
       {/* =========================
           PUBLIC PAGES
       ========================== */}
 
-      <Route path="/" element={<Home />} />
+      <Route
+        path="/"
+        element={<Home />}
+      />
 
-      <Route path="/about" element={<About />} />
+      <Route
+        path="/about"
+        element={<About />}
+      />
 
-      <Route path="/tracking" element={<Tracking />} />
+      <Route
+        path="/tracking"
+        element={<Tracking />}
+      />
 
-      <Route path="/services" element={<ServicesPage />} />
+      <Route
+        path="/services"
+        element={<ServicesPage />}
+      />
 
-      <Route path="/contact" element={<Contact />} />
 
-      <Route path="/pricing" element={<Pricing />} />
+      {/* =========================
+          SERVICE DETAIL PAGES
+      ========================== */}
 
-      <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/services/air-freight"
+        element={<AirFreight />}
+      />
+
+      <Route
+        path="/services/ocean-freight"
+        element={<OceanFreight />}
+      />
+
+      <Route
+        path="/services/road-transport"
+        element={<RoadTransport />}
+      />
+
+      <Route
+        path="/services/warehousing"
+        element={<Warehousing />}
+      />
+
+
+      {/* =========================
+          OTHER PUBLIC PAGES
+      ========================== */}
+
+      <Route
+        path="/contact"
+        element={<Contact />}
+      />
+
+      <Route
+        path="/pricing"
+        element={<Pricing />}
+      />
+
+      <Route
+        path="/signup"
+        element={<Signup />}
+      />
+
 
       {/* =========================
           ADMIN AUTHENTICATION
@@ -56,6 +115,7 @@ function App() {
         path="/admin-login"
         element={<AdminLogin />}
       />
+
 
       {/* =========================
           PROTECTED ADMIN AREA
@@ -79,6 +139,7 @@ function App() {
         }
       />
 
+
       {/* =========================
           FALLBACK
       ========================== */}
@@ -87,6 +148,7 @@ function App() {
         path="*"
         element={<Home />}
       />
+
     </Routes>
   );
 }

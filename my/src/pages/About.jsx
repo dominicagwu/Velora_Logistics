@@ -35,7 +35,7 @@ function About() {
         <section className="py-20 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-indigo-600 font-semibold uppercase tracking-wide text-sm">
-              About Velora Logistics
+              About Velora Freight
             </p>
 
             <h1 className="mt-4 text-4xl lg:text-6xl font-bold text-slate-900 leading-tight">
@@ -139,7 +139,7 @@ function About() {
 
               <p className="mt-4 text-gray-600 leading-8">
                 Our commitment to speed, security, and customer satisfaction is
-                what sets Velora Logistics apart in the logistics industry.
+                what sets Velora Freight apart in the logistics industry.
               </p>
             </div>
 
@@ -175,7 +175,7 @@ function About() {
 
             <p className="mt-4 text-indigo-100 max-w-2xl mx-auto leading-8">
               Whether you’re sending a single package or managing large-scale
-              business logistics, Velora Logistics is here to deliver your shipments
+              business logistics, Velora Freight is here to deliver your shipments
               safely, quickly, and reliably.
             </p>
 

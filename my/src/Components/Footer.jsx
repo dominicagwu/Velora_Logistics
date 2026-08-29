@@ -26,7 +26,7 @@ function Footer() {
               </div>
 
               <span className="text-2xl font-extrabold uppercase tracking-[0.15em]">
-               Velora Logistics
+               Velora Freight
              </span>
             </div>
 
@@ -152,7 +152,7 @@ function Footer() {
 
         {/* Bottom */}
         <div className="mt-8 pt-6 border-t border-white/10 text-center text-sm text-indigo-200">
-          © 2026 Velora Logistics. All Rights Reserved.
+          © 2026 Velora Freight. All Rights Reserved.
           {/* <p>Developed by: Nick Uka</p> */}
         </div>
       </div>

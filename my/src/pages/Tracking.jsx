@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 function Tracking() {
@@ -67,35 +68,43 @@ function Tracking() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 px-4 py-12 sm:py-16">
+      <div className="mx-auto max-w-4xl">
+
+        {/* HOME BUTTON */}
+        <div className="mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-indigo-600"
+          >
+            <span className="text-lg">←</span>
+            Home
+          </Link>
+        </div>
 
         {/* HEADER */}
-        <div className="text-center mb-10">
-
+        <div className="mb-10 text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
             Shipment Tracking
           </p>
 
-          <h1 className="mt-3 text-4xl sm:text-5xl font-bold text-slate-900">
+          <h1 className="mt-3 text-4xl font-bold text-slate-900 sm:text-5xl">
             Track Your Shipment
           </h1>
 
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
             Enter the email address registered to your shipment and your
             tracking number to view your shipment information.
           </p>
-
         </div>
 
         {/* TRACKING FORM */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
           <form onSubmit={handleTrack} className="space-y-5">
 
             {/* EMAIL */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Email Address
               </label>
 
@@ -105,14 +114,14 @@ function Tracking() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your registered email"
                 autoComplete="email"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             {/* TRACKING NUMBER */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Tracking Number
               </label>
 
@@ -122,8 +131,8 @@ function Tracking() {
                 onChange={(e) =>
                   setTrackingNumber(e.target.value)
                 }
-                placeholder="e.g VL-123-456-78"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="e.g. VL-123-456-78"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -135,11 +144,11 @@ function Tracking() {
               </div>
             )}
 
-            {/* BUTTON */}
+            {/* TRACK BUTTON */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white py-3 rounded-xl font-medium transition"
+              className="w-full rounded-xl bg-indigo-600 py-3 font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-400"
             >
               {loading
                 ? "Checking Shipment..."
@@ -147,35 +156,35 @@ function Tracking() {
             </button>
 
           </form>
-
         </div>
 
         {/* SHIPMENT RESULT */}
         {shipment && (
-          <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 
             {/* TOP */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
               <div>
                 <p className="text-sm text-gray-500">
                   Tracking Number
                 </p>
 
-                <h2 className="text-xl font-bold text-indigo-600 break-all">
+                <h2 className="break-all text-xl font-bold text-indigo-600">
                   {shipment.tracking_number}
                 </h2>
               </div>
 
-              <span className="w-fit px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium">
+              <span className="w-fit rounded-full bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-700">
                 {shipment.status || "Shipment Created"}
               </span>
 
             </div>
 
             {/* SHIPMENT DETAILS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
+              {/* SENDER */}
               <div>
                 <p className="text-xs text-gray-500">
                   Sender
@@ -186,6 +195,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* RECEIVER */}
               <div>
                 <p className="text-xs text-gray-500">
                   Receiver
@@ -196,6 +206,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* ORIGIN */}
               <div>
                 <p className="text-xs text-gray-500">
                   Origin
@@ -206,6 +217,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* DESTINATION */}
               <div>
                 <p className="text-xs text-gray-500">
                   Destination
@@ -216,6 +228,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* CURRENT LOCATION */}
               <div>
                 <p className="text-xs text-gray-500">
                   Current Location
@@ -226,6 +239,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* SHIPMENT TYPE */}
               <div>
                 <p className="text-xs text-gray-500">
                   Shipment Type
@@ -236,6 +250,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* SHIPPING DATE */}
               <div>
                 <p className="text-xs text-gray-500">
                   Shipping Date
@@ -246,6 +261,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* EXPECTED DELIVERY */}
               <div>
                 <p className="text-xs text-gray-500">
                   Expected Delivery
@@ -256,6 +272,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* ESTIMATED TRANSIT */}
               <div>
                 <p className="text-xs text-gray-500">
                   Estimated Transit
@@ -267,6 +284,7 @@ function Tracking() {
                 </p>
               </div>
 
+              {/* PACKAGE DESCRIPTION */}
               <div>
                 <p className="text-xs text-gray-500">
                   Package Description
@@ -287,7 +305,7 @@ function Tracking() {
                 setMessage("");
                 setTrackingNumber("");
               }}
-              className="mt-8 border border-gray-300 bg-white hover:bg-gray-50 text-slate-700 px-5 py-3 rounded-xl text-sm font-medium transition"
+              className="mt-8 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-gray-50"
             >
               Track Another Shipment
             </button>
