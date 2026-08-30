@@ -1,6 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
 import { useState } from "react";
-import image from "../assets/freight.png";
+import image from "../assets/Freight.png";
 import { FaPhoneAlt, FaBars, FaTimes } from "react-icons/fa";
 
 function Navbar() {
