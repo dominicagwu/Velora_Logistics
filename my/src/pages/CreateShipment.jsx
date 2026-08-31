@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import { generateTrackingNumber } from "../utils/generateTrackingNumber";
 
 function CreateShipment() {
-  const [form, setForm] = useState({
+  const initialForm = {
     // =========================
     // SENDER DETAILS
     // =========================
@@ -61,8 +61,9 @@ function CreateShipment() {
     delivery_route: "",
     origin: "",
     destination: "",
-  });
+  };
 
+  const [form, setForm] = useState(initialForm);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -103,7 +104,10 @@ function CreateShipment() {
           sender_alt_phone: form.sender_alt_phone || null,
           sender_email: form.sender_email || null,
           sender_business: form.sender_business || null,
+
+          // ⭐ SENDER ADDRESS
           sender_address: form.sender_address,
+
           sender_city: form.sender_city,
           sender_state: form.sender_state,
           sender_country: form.sender_country,
@@ -116,7 +120,10 @@ function CreateShipment() {
           receiver_phone: form.receiver_phone,
           receiver_alt_phone: form.receiver_alt_phone || null,
           receiver_email: form.receiver_email || null,
+
+          // ⭐ RECEIVER ADDRESS
           receiver_address: form.receiver_address,
+
           receiver_apartment: form.receiver_apartment || null,
           receiver_landmark: form.receiver_landmark || null,
           receiver_city: form.receiver_city,
@@ -129,6 +136,7 @@ function CreateShipment() {
           // =========================
           package_name: form.package_name,
           package_description: form.package_description,
+
           quantity: form.quantity
             ? Number(form.quantity)
             : null,
@@ -185,7 +193,7 @@ function CreateShipment() {
             form.delivery_route || null,
 
           // =========================
-          // EXISTING FIELDS
+          // ORIGIN / DESTINATION
           // =========================
           origin: form.origin,
           destination: form.destination,
@@ -206,7 +214,6 @@ function CreateShipment() {
           `❌ Unable to create shipment: ${error.message}`
         );
 
-        setLoading(false);
         return;
       }
 
@@ -217,53 +224,8 @@ function CreateShipment() {
       // =========================
       // RESET FORM
       // =========================
-      setForm({
-        sender_name: "",
-        sender_phone: "",
-        sender_alt_phone: "",
-        sender_email: "",
-        sender_business: "",
-        sender_address: "",
-        sender_city: "",
-        sender_state: "",
-        sender_country: "",
-        sender_postal_code: "",
+      setForm(initialForm);
 
-        receiver_name: "",
-        receiver_phone: "",
-        receiver_alt_phone: "",
-        receiver_email: "",
-        receiver_address: "",
-        receiver_apartment: "",
-        receiver_landmark: "",
-        receiver_city: "",
-        receiver_state: "",
-        receiver_country: "",
-        receiver_postal_code: "",
-
-        package_name: "",
-        package_description: "",
-        quantity: "",
-        weight_kg: "",
-        length_cm: "",
-        width_cm: "",
-        height_cm: "",
-        package_type: "",
-        fragile: "false",
-        special_handling: "",
-        declared_value: "",
-
-        shipment_type: "",
-        delivery_type: "",
-        shipping_date: "",
-        expected_delivery: "",
-        actual_delivery: "",
-        assigned_driver: "",
-        vehicle: "",
-        delivery_route: "",
-        origin: "",
-        destination: "",
-      });
     } catch (error) {
       console.error("Unexpected error:", error);
 
@@ -366,6 +328,7 @@ function CreateShipment() {
                   className="input"
                 />
 
+                {/* ⭐ SENDER ADDRESS */}
                 <input
                   type="text"
                   name="sender_address"
@@ -417,7 +380,6 @@ function CreateShipment() {
 
               </div>
             </section>
-
 
             {/* =====================================================
                 2. RECEIVER DETAILS
@@ -471,12 +433,13 @@ function CreateShipment() {
                   className="input"
                 />
 
+                {/* ⭐⭐⭐ RECEIVER ADDRESS — THIS IS THE ONE YOU WANT ⭐⭐⭐ */}
                 <input
                   type="text"
                   name="receiver_address"
                   value={form.receiver_address}
                   onChange={handleChange}
-                  placeholder="Delivery Address"
+                  placeholder="Receiver Address"
                   required
                   className="input"
                 />
@@ -540,7 +503,6 @@ function CreateShipment() {
 
               </div>
             </section>
-
 
             {/* =====================================================
                 3. PACKAGE DETAILS
@@ -632,26 +594,11 @@ function CreateShipment() {
                   <option value="">
                     Select Package Type
                   </option>
-
-                  <option value="Envelope">
-                    Envelope
-                  </option>
-
-                  <option value="Box">
-                    Box
-                  </option>
-
-                  <option value="Parcel">
-                    Parcel
-                  </option>
-
-                  <option value="Pallet">
-                    Pallet
-                  </option>
-
-                  <option value="Other">
-                    Other
-                  </option>
+                  <option value="Envelope">Envelope</option>
+                  <option value="Box">Box</option>
+                  <option value="Parcel">Parcel</option>
+                  <option value="Pallet">Pallet</option>
+                  <option value="Other">Other</option>
                 </select>
 
                 <select
@@ -663,7 +610,6 @@ function CreateShipment() {
                   <option value="false">
                     Fragile: No
                   </option>
-
                   <option value="true">
                     Fragile: Yes
                   </option>
@@ -702,7 +648,6 @@ function CreateShipment() {
               </div>
             </section>
 
-
             {/* =====================================================
                 4. DELIVERY DETAILS
             ====================================================== */}
@@ -717,7 +662,6 @@ function CreateShipment() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                {/* SHIPMENT TYPE */}
                 <select
                   name="shipment_type"
                   value={form.shipment_type}
@@ -728,21 +672,17 @@ function CreateShipment() {
                   <option value="">
                     Select Shipment Type
                   </option>
-
                   <option value="Air Freight">
                     Air Freight
                   </option>
-
                   <option value="Ocean Freight">
                     Ocean Freight
                   </option>
-
                   <option value="Road Transport">
                     Road Transport
                   </option>
                 </select>
 
-                {/* DELIVERY TYPE */}
                 <select
                   name="delivery_type"
                   value={form.delivery_type}
@@ -753,25 +693,12 @@ function CreateShipment() {
                   <option value="">
                     Select Delivery Type
                   </option>
-
-                  <option value="Standard">
-                    Standard
-                  </option>
-
-                  <option value="Express">
-                    Express
-                  </option>
-
-                  <option value="Same Day">
-                    Same Day
-                  </option>
-
-                  <option value="Overnight">
-                    Overnight
-                  </option>
+                  <option value="Standard">Standard</option>
+                  <option value="Express">Express</option>
+                  <option value="Same Day">Same Day</option>
+                  <option value="Overnight">Overnight</option>
                 </select>
 
-                {/* ORIGIN */}
                 <input
                   type="text"
                   name="origin"
@@ -782,7 +709,6 @@ function CreateShipment() {
                   className="input"
                 />
 
-                {/* DESTINATION */}
                 <input
                   type="text"
                   name="destination"
@@ -793,7 +719,6 @@ function CreateShipment() {
                   className="input"
                 />
 
-                {/* PICKUP DATE */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Pickup Date
@@ -809,7 +734,6 @@ function CreateShipment() {
                   />
                 </div>
 
-                {/* EXPECTED DELIVERY */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Expected Delivery Date
@@ -825,7 +749,6 @@ function CreateShipment() {
                   />
                 </div>
 
-                {/* ACTUAL DELIVERY */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Actual Delivery Date
@@ -840,7 +763,6 @@ function CreateShipment() {
                   />
                 </div>
 
-                {/* DRIVER */}
                 <input
                   type="text"
                   name="assigned_driver"
@@ -850,7 +772,6 @@ function CreateShipment() {
                   className="input"
                 />
 
-                {/* VEHICLE */}
                 <input
                   type="text"
                   name="vehicle"
@@ -860,7 +781,6 @@ function CreateShipment() {
                   className="input"
                 />
 
-                {/* ROUTE */}
                 <input
                   type="text"
                   name="delivery_route"
@@ -872,7 +792,6 @@ function CreateShipment() {
 
               </div>
             </section>
-
 
             {/* =========================
                 SUBMIT
@@ -892,7 +811,6 @@ function CreateShipment() {
             </div>
 
           </form>
-
 
           {/* =========================
               MESSAGE

@@ -4,14 +4,24 @@ import { supabase } from "../lib/supabase";
 
 const emptyForm = {
   tracking_number: "",
+
+  // SENDER
   sender_name: "",
-  sender_country: "",
+  sender_address: "",
   sender_city: "",
+  sender_state: "",
+  sender_country: "",
+
+  // RECEIVER
   receiver_name: "",
+  receiver_address: "",
+  receiver_city: "",
+  receiver_state: "",
+  receiver_country: "",
   receiver_email: "",
   receiver_phone: "",
-  receiver_city: "",
-  receiver_country: "",
+
+  // SHIPMENT
   shipment_type: "",
   origin: "",
   destination: "",
@@ -82,7 +92,7 @@ function Dashboard() {
   };
 
   // =========================================================
-  // LOAD SHIPMENTS WHEN DASHBOARD OPENS
+  // LOAD SHIPMENTS
   // =========================================================
   useEffect(() => {
     let cancelled = false;
@@ -104,7 +114,7 @@ function Dashboard() {
   }, []);
 
   // =========================================================
-  // REFRESH SHIPMENTS
+  // REFRESH
   // =========================================================
   const handleRefresh = async () => {
     setLoading(true);
@@ -116,7 +126,7 @@ function Dashboard() {
   };
 
   // =========================================================
-  // ADMIN SIGN OUT
+  // SIGN OUT
   // =========================================================
   const handleSignOut = async () => {
     const confirmed = window.confirm(
@@ -197,6 +207,11 @@ function Dashboard() {
       return;
     }
 
+    if (!form.receiver_address.trim()) {
+      alert("Please enter the receiver address.");
+      return;
+    }
+
     if (!form.origin.trim()) {
       alert("Please enter the shipment origin.");
       return;
@@ -214,22 +229,48 @@ function Dashboard() {
         .trim()
         .toUpperCase(),
 
+      // =========================
+      // SENDER
+      // =========================
       sender_name: form.sender_name.trim(),
+      sender_address: form.sender_address.trim(),
       sender_country: form.sender_country.trim(),
       sender_city: form.sender_city.trim(),
+      sender_state: form.sender_state.trim(),
 
+      // =========================
+      // RECEIVER
+      // =========================
       receiver_name: form.receiver_name.trim(),
+
+      receiver_address:
+        form.receiver_address.trim(),
+
       receiver_email: form.receiver_email
         .trim()
         .toLowerCase(),
-      receiver_phone: form.receiver_phone.trim(),
-      receiver_city: form.receiver_city.trim(),
-      receiver_country: form.receiver_country.trim(),
 
+      receiver_phone:
+        form.receiver_phone.trim(),
+
+      receiver_city:
+        form.receiver_city.trim(),
+
+      receiver_state:
+        form.receiver_state.trim(),
+
+      receiver_country:
+        form.receiver_country.trim(),
+
+      // =========================
+      // SHIPMENT
+      // =========================
       shipment_type: form.shipment_type,
 
       origin: form.origin.trim(),
-      destination: form.destination.trim(),
+
+      destination:
+        form.destination.trim(),
 
       package_description:
         form.package_description.trim(),
@@ -254,7 +295,8 @@ function Dashboard() {
         form.location.trim() ||
         form.origin.trim(),
 
-      updated_at: new Date().toISOString(),
+      updated_at:
+        new Date().toISOString(),
     };
 
     const { data, error } = await supabase
@@ -282,7 +324,9 @@ function Dashboard() {
       ...prev,
     ]);
 
-    setForm({ ...emptyForm });
+    setForm({
+      ...emptyForm,
+    });
 
     alert(
       `Shipment created successfully!\n\nTracking Number: ${data.tracking_number}`
@@ -394,8 +438,12 @@ function Dashboard() {
       tracking_number:
         shipment.tracking_number || "",
 
+      // SENDER
       sender_name:
         shipment.sender_name || "",
+
+      sender_address:
+        shipment.sender_address || "",
 
       sender_country:
         shipment.sender_country || "",
@@ -403,8 +451,15 @@ function Dashboard() {
       sender_city:
         shipment.sender_city || "",
 
+      sender_state:
+        shipment.sender_state || "",
+
+      // RECEIVER
       receiver_name:
         shipment.receiver_name || "",
+
+      receiver_address:
+        shipment.receiver_address || "",
 
       receiver_email:
         shipment.receiver_email || "",
@@ -415,9 +470,13 @@ function Dashboard() {
       receiver_city:
         shipment.receiver_city || "",
 
+      receiver_state:
+        shipment.receiver_state || "",
+
       receiver_country:
         shipment.receiver_country || "",
 
+      // SHIPMENT
       shipment_type:
         shipment.shipment_type || "",
 
@@ -493,6 +552,15 @@ function Dashboard() {
       return;
     }
 
+    if (
+      !editingForm.receiver_address.trim()
+    ) {
+      alert(
+        "Receiver address cannot be empty."
+      );
+      return;
+    }
+
     setSaving(true);
 
     const updateData = {
@@ -501,8 +569,14 @@ function Dashboard() {
           .trim()
           .toUpperCase(),
 
+      // =========================
+      // SENDER
+      // =========================
       sender_name:
         editingForm.sender_name.trim(),
+
+      sender_address:
+        editingForm.sender_address.trim(),
 
       sender_country:
         editingForm.sender_country.trim(),
@@ -510,8 +584,17 @@ function Dashboard() {
       sender_city:
         editingForm.sender_city.trim(),
 
+      sender_state:
+        editingForm.sender_state.trim(),
+
+      // =========================
+      // RECEIVER
+      // =========================
       receiver_name:
         editingForm.receiver_name.trim(),
+
+      receiver_address:
+        editingForm.receiver_address.trim(),
 
       receiver_email:
         editingForm.receiver_email
@@ -524,9 +607,15 @@ function Dashboard() {
       receiver_city:
         editingForm.receiver_city.trim(),
 
+      receiver_state:
+        editingForm.receiver_state.trim(),
+
       receiver_country:
         editingForm.receiver_country.trim(),
 
+      // =========================
+      // SHIPMENT
+      // =========================
       shipment_type:
         editingForm.shipment_type,
 
@@ -597,7 +686,9 @@ function Dashboard() {
     );
 
     setEditingId(null);
-    setEditingForm({ ...emptyForm });
+    setEditingForm({
+      ...emptyForm,
+    });
 
     alert(
       "Shipment updated successfully."
@@ -611,7 +702,9 @@ function Dashboard() {
   // =========================================================
   const cancelEdit = () => {
     setEditingId(null);
-    setEditingForm({ ...emptyForm });
+    setEditingForm({
+      ...emptyForm,
+    });
   };
 
   // =========================================================
@@ -662,6 +755,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-3 sm:px-4">
+
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* =====================================================
@@ -745,7 +839,9 @@ function Dashboard() {
               required
             />
 
-            {/* SENDER */}
+            {/* =================================================
+                SENDER
+            ================================================== */}
 
             <input
               type="text"
@@ -763,6 +859,23 @@ function Dashboard() {
               }
               className="border border-gray-300 rounded-xl px-4 py-3"
               required
+            />
+
+            <input
+              type="text"
+              name="sender_address"
+              placeholder="Sender Address"
+              value={
+                editingId
+                  ? editingForm.sender_address
+                  : form.sender_address
+              }
+              onChange={
+                editingId
+                  ? handleEditChange
+                  : handleFormChange
+              }
+              className="border border-gray-300 rounded-xl px-4 py-3"
             />
 
             <input
@@ -799,7 +912,26 @@ function Dashboard() {
               className="border border-gray-300 rounded-xl px-4 py-3"
             />
 
-            {/* RECEIVER */}
+            <input
+              type="text"
+              name="sender_state"
+              placeholder="Sender State / Province"
+              value={
+                editingId
+                  ? editingForm.sender_state
+                  : form.sender_state
+              }
+              onChange={
+                editingId
+                  ? handleEditChange
+                  : handleFormChange
+              }
+              className="border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+            {/* =================================================
+                RECEIVER
+            ================================================== */}
 
             <input
               type="text"
@@ -809,6 +941,26 @@ function Dashboard() {
                 editingId
                   ? editingForm.receiver_name
                   : form.receiver_name
+              }
+              onChange={
+                editingId
+                  ? handleEditChange
+                  : handleFormChange
+              }
+              className="border border-gray-300 rounded-xl px-4 py-3"
+              required
+            />
+
+            {/* ⭐ RECEIVER ADDRESS ⭐ */}
+
+            <input
+              type="text"
+              name="receiver_address"
+              placeholder="Receiver Address"
+              value={
+                editingId
+                  ? editingForm.receiver_address
+                  : form.receiver_address
               }
               onChange={
                 editingId
@@ -872,6 +1024,23 @@ function Dashboard() {
 
             <input
               type="text"
+              name="receiver_state"
+              placeholder="Receiver State / Province"
+              value={
+                editingId
+                  ? editingForm.receiver_state
+                  : form.receiver_state
+              }
+              onChange={
+                editingId
+                  ? handleEditChange
+                  : handleFormChange
+              }
+              className="border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+            <input
+              type="text"
               name="receiver_country"
               placeholder="Receiver Country"
               value={
@@ -887,7 +1056,9 @@ function Dashboard() {
               className="border border-gray-300 rounded-xl px-4 py-3"
             />
 
-            {/* SHIPMENT TYPE */}
+            {/* =================================================
+                SHIPMENT TYPE
+            ================================================== */}
 
             <select
               name="shipment_type"
@@ -1148,8 +1319,6 @@ function Dashboard() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-          {/* DASHBOARD HEADER */}
-
           <div className="px-4 sm:px-6 py-5 border-b border-gray-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
@@ -1190,6 +1359,7 @@ function Dashboard() {
 
           {loading ? (
             <div className="p-10 text-center">
+
               <div className="inline-flex items-center gap-3 text-gray-600">
 
                 <span className="h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
@@ -1197,6 +1367,7 @@ function Dashboard() {
                 Loading shipments...
 
               </div>
+
             </div>
           ) : shipments.length === 0 ? (
             <div className="p-10 text-center">
@@ -1227,8 +1398,6 @@ function Dashboard() {
 
                       <div className="flex flex-col gap-4">
 
-                        {/* TOP */}
-
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
 
                           <div className="min-w-0">
@@ -1249,14 +1418,13 @@ function Dashboard() {
 
                         </div>
 
-                        {/* DETAILS */}
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
                           <div>
                             <p className="text-xs text-gray-500">
                               Sender
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.sender_name || "—"}
                             </p>
@@ -1264,10 +1432,33 @@ function Dashboard() {
 
                           <div>
                             <p className="text-xs text-gray-500">
+                              Sender Address
+                            </p>
+
+                            <p className="font-medium text-slate-900 break-words">
+                              {shipment.sender_address || "—"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">
                               Receiver
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.receiver_name || "—"}
+                            </p>
+                          </div>
+
+                          {/* ⭐ RECEIVER ADDRESS ⭐ */}
+
+                          <div>
+                            <p className="text-xs text-gray-500">
+                              Receiver Address
+                            </p>
+
+                            <p className="font-medium text-slate-900 break-words">
+                              {shipment.receiver_address || "—"}
                             </p>
                           </div>
 
@@ -1275,6 +1466,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Receiver Email
                             </p>
+
                             <p className="font-medium text-slate-900 break-all">
                               {shipment.receiver_email || "—"}
                             </p>
@@ -1284,6 +1476,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Receiver Phone
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.receiver_phone || "—"}
                             </p>
@@ -1293,6 +1486,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Receiver City
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.receiver_city || "—"}
                             </p>
@@ -1300,8 +1494,19 @@ function Dashboard() {
 
                           <div>
                             <p className="text-xs text-gray-500">
+                              Receiver State
+                            </p>
+
+                            <p className="font-medium text-slate-900">
+                              {shipment.receiver_state || "—"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500">
                               Receiver Country
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.receiver_country || "—"}
                             </p>
@@ -1311,6 +1516,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Origin
                             </p>
+
                             <p className="font-medium text-slate-900 break-words">
                               {shipment.origin || "—"}
                             </p>
@@ -1320,6 +1526,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Destination
                             </p>
+
                             <p className="font-medium text-slate-900 break-words">
                               {shipment.destination || "—"}
                             </p>
@@ -1329,6 +1536,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Current Location
                             </p>
+
                             <p className="font-medium text-slate-900 break-words">
                               {shipment.location || "—"}
                             </p>
@@ -1338,6 +1546,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Shipment Type
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.shipment_type || "—"}
                             </p>
@@ -1347,6 +1556,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Weight
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.weight_kg !== null &&
                               shipment.weight_kg !== undefined
@@ -1359,6 +1569,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Transit Time
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.estimated_delivery ||
                                 "3–5 Business Days"}
@@ -1369,6 +1580,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Shipping Date
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.shipping_date || "—"}
                             </p>
@@ -1378,6 +1590,7 @@ function Dashboard() {
                             <p className="text-xs text-gray-500">
                               Expected Delivery
                             </p>
+
                             <p className="font-medium text-slate-900">
                               {shipment.expected_delivery || "—"}
                             </p>
@@ -1409,6 +1622,7 @@ function Dashboard() {
                             }
                             className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white"
                           >
+
                             {statusOptions.map(
                               (status) => (
                                 <option
@@ -1419,6 +1633,7 @@ function Dashboard() {
                                 </option>
                               )
                             )}
+
                           </select>
 
                         </div>
@@ -1530,7 +1745,7 @@ function Dashboard() {
                       </th>
 
                       <th className="text-left px-5 py-4 font-semibold">
-                        Receiver Location
+                        Receiver Address
                       </th>
 
                       <th className="text-left px-5 py-4 font-semibold">
@@ -1582,16 +1797,12 @@ function Dashboard() {
                             </p>
 
                             <p className="text-xs text-gray-500">
-
                               {shipment.sender_city || ""}
-
                               {shipment.sender_city &&
                               shipment.sender_country
                                 ? ", "
                                 : ""}
-
                               {shipment.sender_country || ""}
-
                             </p>
 
                           </td>
@@ -1605,25 +1816,28 @@ function Dashboard() {
                             </p>
 
                             <p className="text-xs text-gray-500">
-
                               {shipment.receiver_email ||
                                 shipment.receiver_phone ||
                                 "—"}
-
                             </p>
 
                           </td>
 
-                          {/* RECEIVER LOCATION */}
+                          {/* ⭐ RECEIVER ADDRESS ⭐ */}
 
                           <td className="px-5 py-4">
 
-                            <p className="font-medium text-slate-900 whitespace-nowrap">
-                              {shipment.receiver_city || "—"}
+                            <p className="font-medium text-slate-900 max-w-xs break-words">
+                              {shipment.receiver_address || "—"}
                             </p>
 
-                            <p className="text-xs text-gray-500 whitespace-nowrap">
-                              {shipment.receiver_country || "—"}
+                            <p className="text-xs text-gray-500 mt-1">
+                              {shipment.receiver_city || ""}
+                              {shipment.receiver_city &&
+                              shipment.receiver_country
+                                ? ", "
+                                : ""}
+                              {shipment.receiver_country || ""}
                             </p>
 
                           </td>
@@ -1750,7 +1964,6 @@ function Dashboard() {
                           </td>
 
                         </tr>
-
                       )
                     )}
 

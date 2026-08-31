@@ -1,3 +1,4 @@
+import CustomerShipmentMap from "../Components/CustomerShipmentMap";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -17,9 +18,6 @@ function CustomerDashboard() {
     setErrorMessage("");
 
     try {
-      // ==========================================
-      // GET CURRENTLY LOGGED-IN CUSTOMER
-      // ==========================================
       const {
         data: { user: currentUser },
         error: userError,
@@ -27,11 +25,9 @@ function CustomerDashboard() {
 
       if (userError) {
         console.error("User error:", userError);
-
         setErrorMessage(userError.message);
         setShipments([]);
         setLoading(false);
-
         return;
       }
 
@@ -39,9 +35,7 @@ function CustomerDashboard() {
       // CUSTOMER NOT LOGGED IN
       // ==========================================
       if (!currentUser) {
-        sessionStorage.removeItem(
-          "customer_tracking_number"
-        );
+        sessionStorage.removeItem("customer_tracking_number");
 
         navigate("/login", {
           replace: true,
@@ -52,44 +46,26 @@ function CustomerDashboard() {
 
       setUser(currentUser);
 
-      console.log(
-        "Logged in customer:",
-        currentUser.email
-      );
-
       // ==========================================
       // GET VERIFIED TRACKING NUMBER
       // ==========================================
       const trackingNumber =
-        sessionStorage.getItem(
-          "customer_tracking_number"
-        );
+        sessionStorage.getItem("customer_tracking_number");
 
       if (!trackingNumber) {
-        console.error(
-          "No verified tracking number found."
-        );
-
         setErrorMessage(
           "No verified tracking number was found for this account. Please sign in again."
         );
 
         setShipments([]);
         setLoading(false);
-
         return;
       }
-
-      console.log(
-        "Verified customer tracking number:",
-        trackingNumber
-      );
 
       // ==========================================
       // CUSTOMER EMAIL
       // ==========================================
-      const customerEmail =
-        currentUser.email?.trim();
+      const customerEmail = currentUser.email?.trim();
 
       if (!customerEmail) {
         setErrorMessage(
@@ -98,36 +74,23 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
-
         return;
       }
 
       // ==========================================
-      // LOAD ONLY THE VERIFIED SHIPMENT
-      //
-      // Tracking number identifies the shipment.
-      // Receiver email confirms ownership.
+      // LOAD VERIFIED SHIPMENT
       // ==========================================
       const { data, error } = await supabase
         .from("shipments")
         .select("*")
-        .eq(
-          "tracking_number",
-          trackingNumber
-        )
-        .ilike(
-          "receiver_email",
-          customerEmail
-        )
+        .eq("tracking_number", trackingNumber)
+        .ilike("receiver_email", customerEmail)
         .order("created_at", {
           ascending: false,
         });
 
       if (error) {
-        console.error(
-          "Shipment loading error:",
-          error
-        );
+        console.error("Shipment loading error:", error);
 
         setErrorMessage(
           `Unable to load shipment: ${error.message}`
@@ -135,21 +98,11 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
-
         return;
       }
 
-      console.log(
-        "Verified customer shipment:",
-        data
-      );
-
       // ==========================================
       // SECURITY CHECK
-      //
-      // If the tracking number exists but does
-      // not belong to this customer's email,
-      // don't display the shipment.
       // ==========================================
       if (!data || data.length === 0) {
         setErrorMessage(
@@ -158,16 +111,12 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
-
         return;
       }
 
       setShipments(data);
     } catch (error) {
-      console.error(
-        "Unexpected error:",
-        error
-      );
+      console.error("Unexpected error:", error);
 
       setErrorMessage(
         error?.message ||
@@ -181,22 +130,112 @@ function CustomerDashboard() {
   }, [navigate]);
 
   // ==========================================
-// LOAD SHIPMENT WHEN DASHBOARD OPENS
-// ==========================================
-useEffect(() => {
-  const timer = setTimeout(() => {
+  // INITIAL LOAD
+  // ==========================================
+  useEffect(() => {
     loadShipments();
-  }, 0);
+  }, [loadShipments]);
 
-  return () => clearTimeout(timer);
-}, [loadShipments]);
+  // ==========================================
+  // REAL-TIME SHIPMENT TRACKING
+  // ==========================================
+  useEffect(() => {
+    if (!user || shipments.length === 0) {
+      return;
+    }
+
+    const trackingNumber =
+      shipments[0]?.tracking_number;
+
+    if (!trackingNumber) {
+      return;
+    }
+
+    console.log(
+      "Starting LIVE shipment tracking:",
+      trackingNumber
+    );
+
+    const channel = supabase
+      .channel(`live-shipment-${trackingNumber}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "shipments",
+          filter: `tracking_number=eq.${trackingNumber}`,
+        },
+        (payload) => {
+          console.log(
+            "🔴 LIVE SHIPMENT UPDATE:",
+            payload.new
+          );
+
+          const updatedShipment = payload.new;
+
+          // ==========================================
+          // SECURITY CHECK
+          // ==========================================
+          const updatedEmail =
+            updatedShipment.receiver_email
+              ?.trim()
+              ?.toLowerCase();
+
+          const loggedInEmail =
+            user.email
+              ?.trim()
+              ?.toLowerCase();
+
+          if (
+            updatedEmail !== loggedInEmail
+          ) {
+            console.warn(
+              "Realtime update rejected: customer mismatch."
+            );
+
+            return;
+          }
+
+          // ==========================================
+          // UPDATE CUSTOMER DASHBOARD IMMEDIATELY
+          // ==========================================
+          setShipments((currentShipments) =>
+            currentShipments.map((shipment) =>
+              shipment.id === updatedShipment.id
+                ? {
+                    ...shipment,
+                    ...updatedShipment,
+                  }
+                : shipment
+            )
+          );
+        }
+      )
+      .subscribe((status) => {
+        console.log(
+          "Realtime connection status:",
+          status
+        );
+      });
+
+    // ==========================================
+    // CLEANUP
+    // ==========================================
+    return () => {
+      console.log(
+        "Stopping LIVE shipment tracking."
+      );
+
+      supabase.removeChannel(channel);
+    };
+  }, [user, shipments.length, shipments[0]?.tracking_number]);
 
   // ==========================================
   // REFRESH
   // ==========================================
   const handleRefresh = async () => {
     setLoading(true);
-
     await loadShipments();
   };
 
@@ -212,10 +251,7 @@ useEffect(() => {
       await supabase.auth.signOut();
 
     if (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
+      console.error("Logout error:", error);
 
       setErrorMessage(
         `Unable to logout: ${error.message}`
@@ -250,8 +286,6 @@ useEffect(() => {
         return "bg-yellow-100 text-yellow-700";
 
       case "arrived at origin hub":
-        return "bg-purple-100 text-purple-700";
-
       case "arrived at destination hub":
         return "bg-purple-100 text-purple-700";
 
@@ -286,15 +320,12 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* ========================================
-          HEADER
-      ======================================== */}
+      {/* HEADER */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-            {/* CUSTOMER INFO */}
             <div>
               <p className="text-sm font-medium text-indigo-600">
                 Velora Logistics
@@ -313,7 +344,6 @@ useEffect(() => {
               </p>
             </div>
 
-            {/* ACTIONS */}
             <div className="flex flex-col sm:flex-row gap-3">
 
               <button
@@ -338,18 +368,13 @@ useEffect(() => {
             </div>
 
           </div>
-
         </div>
       </header>
 
-      {/* ========================================
-          MAIN
-      ======================================== */}
+      {/* MAIN */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* ======================================
-            ERROR
-        ====================================== */}
+        {/* ERROR */}
         {errorMessage && (
           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
 
@@ -380,14 +405,10 @@ useEffect(() => {
           </div>
         )}
 
-        {/* ======================================
-            STATISTICS
-        ====================================== */}
+        {/* STATISTICS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
 
-          {/* TOTAL */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
             <p className="text-sm text-gray-500">
               My Shipment
             </p>
@@ -395,12 +416,9 @@ useEffect(() => {
             <p className="text-3xl font-bold text-slate-900 mt-2">
               {shipments.length}
             </p>
-
           </div>
 
-          {/* IN TRANSIT */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
             <p className="text-sm text-gray-500">
               In Transit
             </p>
@@ -414,12 +432,9 @@ useEffect(() => {
                 ).length
               }
             </p>
-
           </div>
 
-          {/* DELIVERED */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
             <p className="text-sm text-gray-500">
               Delivered
             </p>
@@ -433,14 +448,11 @@ useEffect(() => {
                 ).length
               }
             </p>
-
           </div>
 
         </div>
 
-        {/* ======================================
-            NO SHIPMENT
-        ====================================== */}
+        {/* NO SHIPMENT */}
         {shipments.length === 0 ? (
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
@@ -463,174 +475,241 @@ useEffect(() => {
 
         ) : (
 
-          /* ====================================
-             SHIPMENT
-          ==================================== */
-          <div className="space-y-5">
+          <div className="space-y-8">
 
             {shipments.map((shipment) => (
 
               <div
                 key={shipment.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                className="space-y-6"
               >
 
-                {/* ==================================
-                    TOP
-                ================================== */}
-                <div className="p-6 border-b border-gray-100">
+                {/* SHIPMENT SUMMARY */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="p-6 border-b border-gray-100">
 
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Tracking Number
-                      </p>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                      <p className="text-xl font-bold text-indigo-600 mt-1 break-all">
-                        {shipment.tracking_number}
-                      </p>
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Tracking Number
+                        </p>
+
+                        <p className="text-xl font-bold text-indigo-600 mt-1 break-all">
+                          {shipment.tracking_number}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
+                          shipment.status
+                        )}`}
+                      >
+                        {shipment.status ||
+                          "Shipment Created"}
+                      </span>
+
                     </div>
-
-                    <span
-                      className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(
-                        shipment.status
-                      )}`}
-                    >
-                      {shipment.status ||
-                        "Shipment Created"}
-                    </span>
-
                   </div>
 
-                </div>
+                  <div className="p-6">
 
-                {/* ==================================
-                    DETAILS
-                ================================== */}
-                <div className="p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {/* SENDER */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Sender
+                        </p>
 
-                    {/* SENDER */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Sender
-                      </p>
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.sender_name ||
+                            "Not available"}
+                        </p>
 
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.sender_name ||
-                          "Not available"}
-                      </p>
+                        <p className="text-sm text-gray-500">
+                          {shipment.sender_city &&
+                          shipment.sender_country
+                            ? `${shipment.sender_city}, ${shipment.sender_country}`
+                            : "Not available"}
+                        </p>
+                      </div>
 
-                      <p className="text-sm text-gray-500">
-                        {shipment.sender_city &&
-                        shipment.sender_country
-                          ? `${shipment.sender_city}, ${shipment.sender_country}`
-                          : "Not available"}
-                      </p>
+                      {/* RECEIVER */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Receiver
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.receiver_name ||
+                            "Not available"}
+                        </p>
+
+                        <p className="text-sm text-gray-500">
+                          {shipment.receiver_city &&
+                          shipment.receiver_country
+                            ? `${shipment.receiver_city}, ${shipment.receiver_country}`
+                            : "Not available"}
+                        </p>
+                      </div>
+
+                      {/* DESTINATION */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Destination
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.destination ||
+                            "Not available"}
+                        </p>
+                      </div>
+
+                      {/* SHIPMENT TYPE */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Shipment Type
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.shipment_type ||
+                            "General Cargo"}
+                        </p>
+                      </div>
+
+                      {/* DELIVERY TYPE */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Delivery Type
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.delivery_type ||
+                            "Standard"}
+                        </p>
+                      </div>
+
+                      {/* PACKAGE */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Package
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.package_name ||
+                            shipment.package_description ||
+                            "Not available"}
+                        </p>
+                      </div>
+
+                      {/* QUANTITY */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Quantity
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.quantity ??
+                            "Not available"}
+                        </p>
+                      </div>
+
+                      {/* WEIGHT */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Weight
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.weight_kg !== null &&
+                          shipment.weight_kg !== undefined
+                            ? `${shipment.weight_kg} kg`
+                            : "Not available"}
+                        </p>
+                      </div>
+
+                      {/* SHIPPING DATE */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Shipping Date
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.shipping_date ||
+                            "Not available"}
+                        </p>
+                      </div>
+
+                      {/* EXPECTED DELIVERY */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Expected Delivery
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.expected_delivery ||
+                            "Pending"}
+                        </p>
+                      </div>
+
+                      {/* LIVE LOCATION */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Current Location
+                        </p>
+
+                        <div className="flex items-center gap-2 mt-1">
+
+                          <span className="relative flex h-3 w-3">
+
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+
+                          </span>
+
+                          <p className="font-medium text-slate-900">
+                            {shipment.location ||
+                              "Not available"}
+                          </p>
+
+                        </div>
+
+                        <p className="text-xs text-green-600 mt-1">
+                          ● Live tracking enabled
+                        </p>
+                      </div>
+
+                      {/* DRIVER */}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Assigned Driver
+                        </p>
+
+                        <p className="font-medium text-slate-900 mt-1">
+                          {shipment.assigned_driver ||
+                            "Not assigned"}
+                        </p>
+                      </div>
+
                     </div>
-
-                    {/* DESTINATION */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Destination
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.destination ||
-                          "Not available"}
-                      </p>
-                    </div>
-
-                    {/* SHIPMENT TYPE */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Shipment Type
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.shipment_type ||
-                          "General Cargo"}
-                      </p>
-                    </div>
-
-                    {/* WEIGHT */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Weight
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.weight_kg !== null &&
-                        shipment.weight_kg !== undefined
-                          ? `${shipment.weight_kg} kg`
-                          : "Not available"}
-                      </p>
-                    </div>
-
-                    {/* PACKAGE */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Package
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.package_description ||
-                          "Not available"}
-                      </p>
-                    </div>
-
-                    {/* SHIPPING DATE */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Shipping Date
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.shipping_date ||
-                          "Not available"}
-                      </p>
-                    </div>
-
-                    {/* EXPECTED DELIVERY */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Expected Delivery
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.expected_delivery ||
-                          "Pending"}
-                      </p>
-                    </div>
-
-                    {/* CURRENT LOCATION */}
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        Current Location
-                      </p>
-
-                      <p className="font-medium text-slate-900 mt-1">
-                        {shipment.location ||
-                          "Not available"}
-                      </p>
-                    </div>
-
                   </div>
-
                 </div>
+
+                {/* LIVE MAP */}
+                <CustomerShipmentMap
+                  shipment={shipment}
+                />
 
               </div>
-
             ))}
 
           </div>
-
         )}
 
       </main>
-
     </div>
   );
 }
