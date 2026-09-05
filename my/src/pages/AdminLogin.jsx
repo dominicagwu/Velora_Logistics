@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import image1 from "../assets/v-logo2.png";
+import image1 from "../assets/V-LOGO2.png";
 
 function AdminLogin() {
   const [mode, setMode] = useState("login");
