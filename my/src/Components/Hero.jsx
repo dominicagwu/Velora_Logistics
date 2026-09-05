@@ -1,27 +1,32 @@
 import truck from "../assets/velora2.png";
 import { Link } from "react-router-dom";
+import heroBg from "../assets/hero-bg1.jpg";
 
 function Hero() {
   return (
     <section className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-[#f8fafc]">
 
-      {/* BACKGROUND IMAGE THAT FLOWS TO THE LEFT */}
+      {/* BACKGROUND IMAGE */}
       <div
-        className="absolute inset-y-0 right-0 w-[65%] hidden lg:block bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=1600&auto=format&fit=crop')",
+          backgroundImage: `url(${heroBg})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#f8fafc]/20 to-[#f8fafc]"></div>
+        {/* SUBTLE DARK GRADIENT FOR TEXT READABILITY */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/15 to-transparent"></div>
       </div>
 
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
+
+
+        
+
         {/* LEFT SIDE */}
         <div className="relative z-20">
           <h1
-            className="text-[42px] leading-[1.05] font-bold text-gray-900
+            className="text-[42px] leading-[1.05] font-bold text-gray-100
                        sm:text-5xl sm:leading-tight
                        lg:text-6xl"
           >
@@ -31,7 +36,7 @@ function Hero() {
             </span>
           </h1>
 
-          <p className="mt-6 text-base sm:text-lg text-gray-600 leading-8 max-w-xl">
+          <p className="mt-6 text-base sm:text-lg text-gray-200 leading-8 max-w-xl">
             Fast, reliable and secure delivery solutions for businesses and
             individuals. Track in real-time and stay updated every step of the
             way.
@@ -48,7 +53,7 @@ function Hero() {
     type="text"
     placeholder="Enter tracking number"
     className="flex-1 px-4 py-4 rounded-xl border border-gray-200
-               outline-none text-gray-700 text-base min-w-0"
+               outline-none text-indigo-600 text-base min-w-0"
   />
 
   <Link
@@ -62,7 +67,7 @@ function Hero() {
 </div>
 
           {/* Features */}
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-gray-200">
             <span>✓ Real-time Tracking</span>
             <span>✓ Secure Delivery</span>
             <span>✓ Nationwide Coverage</span>
@@ -92,9 +97,9 @@ function Hero() {
 
             <div>
               <p className="text-yellow-500 text-lg leading-none">★★★★★</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-200">
                 Trusted by{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-gray-200">
                   2,500+ Businesses
                 </span>
               </p>
@@ -163,11 +168,11 @@ function Hero() {
             </div>
 
             <Link
-  to="/tracking-details"
-  className="mt-4 inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
->
-  View Full Journey →
-</Link>
+              to="/tracking-details"
+              className="mt-4 inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+            >
+              View Full Journey →
+            </Link>
           </div>
 
           {/* Copenhagen Card */}
@@ -186,4 +191,3 @@ function Hero() {
 }
 
 export default Hero;
-

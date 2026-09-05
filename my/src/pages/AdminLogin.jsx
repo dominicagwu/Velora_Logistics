@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import image1 from "../assets/admin logo.png";
+import image1 from "../assets/v-logo2.png";
 
 function AdminLogin() {
   const [mode, setMode] = useState("login");
@@ -65,8 +65,8 @@ function AdminLogin() {
       }
 
       // Successful login
-      navigate("/dashboard", {
-        replace: true,
+      navigate("/admin/create-shipment", {
+       replace: true,
       });
     } catch (err) {
       console.error("Admin login error:", err);
@@ -272,11 +272,14 @@ function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+    <div
+  className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-cover bg-center"
+  style={{ backgroundImage: "url('/admin-logo.png')" }}
+>
 
       <div className="w-full max-w-md">
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
+        <div className="bg-white/75 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
 
           {/* =========================
               LOGO / HEADER

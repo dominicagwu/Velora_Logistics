@@ -49,13 +49,12 @@ function FitMap({ points }) {
 function CurrentLocationMarker({ shipment }) {
   const map = useMap();
 
+  const hasCurrentLocation =
+    shipment?.current_lat != null &&
+    shipment?.current_lng != null;
+
   useEffect(() => {
-    if (
-      shipment?.current_lat == null ||
-      shipment?.current_lng == null
-    ) {
-      return;
-    }
+    if (!hasCurrentLocation) return;
 
     map.panTo([
       Number(shipment.current_lat),
@@ -64,13 +63,11 @@ function CurrentLocationMarker({ shipment }) {
   }, [
     shipment?.current_lat,
     shipment?.current_lng,
+    hasCurrentLocation,
     map,
   ]);
 
-  if (
-    shipment?.current_lat == null ||
-    shipment?.current_lng == null
-  ) {
+  if (!hasCurrentLocation) {
     return null;
   }
 
@@ -88,8 +85,7 @@ function CurrentLocationMarker({ shipment }) {
           <br />
 
           <span className="text-sm">
-            {shipment.location ||
-              "Current location"}
+            {shipment.location || "Current location"}
           </span>
 
           <br />
@@ -180,7 +176,6 @@ function CustomerShipmentMap({ shipment }) {
   if (points.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-
         <div className="p-6 border-b border-gray-100">
           <p className="text-sm font-medium text-indigo-600">
             Shipment Tracking
@@ -192,9 +187,7 @@ function CustomerShipmentMap({ shipment }) {
         </div>
 
         <div className="h-[450px] flex items-center justify-center bg-gray-100">
-
           <div className="text-center px-6">
-
             <div className="text-4xl mb-3">
               📍
             </div>
@@ -204,12 +197,9 @@ function CustomerShipmentMap({ shipment }) {
             </h3>
 
             <p className="text-sm text-gray-500 mt-1">
-              The shipment coordinates have not
-              been added yet.
+              The shipment coordinates have not been added yet.
             </p>
-
           </div>
-
         </div>
       </div>
     );
@@ -228,15 +218,11 @@ function CustomerShipmentMap({ shipment }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-      {/* ========================================
-          MAP HEADER
-      ======================================== */}
+      {/* MAP HEADER */}
       <div className="p-6 border-b border-gray-100">
-
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
           <div>
-
             <p className="text-sm font-medium text-indigo-600">
               Shipment Tracking
             </p>
@@ -248,25 +234,19 @@ function CustomerShipmentMap({ shipment }) {
             <p className="text-sm text-gray-500 mt-1">
               Track your shipment from origin to destination
             </p>
-
           </div>
 
           <div className="flex items-center gap-2">
-
             <span
               className={`relative flex h-3 w-3 ${
-                hasCurrentLocation
-                  ? ""
-                  : "opacity-40"
+                hasCurrentLocation ? "" : "opacity-40"
               }`}
             >
-
               {hasCurrentLocation && (
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               )}
 
               <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
-
             </span>
 
             <span className="text-sm font-medium text-green-600">
@@ -274,33 +254,25 @@ function CustomerShipmentMap({ shipment }) {
                 ? "Live Location"
                 : "Location Pending"}
             </span>
-
           </div>
 
         </div>
-
       </div>
 
-      {/* ========================================
-          MAP
-      ======================================== */}
+      {/* MAP */}
       <div className="h-[450px] w-full">
-
         <MapContainer
           center={mapCenter}
           zoom={5}
           scrollWheelZoom={true}
           className="h-full w-full"
         >
-
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* ====================================
-              ORIGIN
-          ==================================== */}
+          {/* ORIGIN */}
           {hasOrigin && (
             <Marker
               position={[
@@ -309,12 +281,8 @@ function CustomerShipmentMap({ shipment }) {
               ]}
             >
               <Popup>
-
                 <div>
-
-                  <strong>
-                    📦 Shipment Origin
-                  </strong>
+                  <strong>📦 Shipment Origin</strong>
 
                   <br />
 
@@ -327,23 +295,15 @@ function CustomerShipmentMap({ shipment }) {
 
                   {shipment.sender_city},{" "}
                   {shipment.sender_country}
-
                 </div>
-
               </Popup>
             </Marker>
           )}
 
-          {/* ====================================
-              CURRENT LOCATION
-          ==================================== */}
-          <CurrentLocationMarker
-            shipment={shipment}
-          />
+          {/* CURRENT LOCATION */}
+          <CurrentLocationMarker shipment={shipment} />
 
-          {/* ====================================
-              DESTINATION
-          ==================================== */}
+          {/* DESTINATION */}
           {hasDestination && (
             <Marker
               position={[
@@ -352,12 +312,8 @@ function CustomerShipmentMap({ shipment }) {
               ]}
             >
               <Popup>
-
                 <div>
-
-                  <strong>
-                    🏁 Delivery Destination
-                  </strong>
+                  <strong>🏁 Delivery Destination</strong>
 
                   <br />
 
@@ -370,16 +326,12 @@ function CustomerShipmentMap({ shipment }) {
 
                   {shipment.receiver_city},{" "}
                   {shipment.receiver_country}
-
                 </div>
-
               </Popup>
             </Marker>
           )}
 
-          {/* ====================================
-              ROUTE
-          ==================================== */}
+          {/* ROUTE */}
           {route.length >= 2 && (
             <Polyline
               positions={route}
@@ -390,25 +342,17 @@ function CustomerShipmentMap({ shipment }) {
             />
           )}
 
-          {/* ====================================
-              AUTO FIT
-          ==================================== */}
+          {/* AUTO FIT */}
           <FitMap points={points} />
-
         </MapContainer>
-
       </div>
 
-      {/* ========================================
-          LOCATION DETAILS
-      ======================================== */}
+      {/* LOCATION DETAILS */}
       <div className="p-6 border-t border-gray-100">
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
           {/* ORIGIN */}
           <div className="bg-gray-50 rounded-xl p-4">
-
             <p className="text-xs font-semibold text-gray-500 uppercase">
               From
             </p>
@@ -417,12 +361,10 @@ function CustomerShipmentMap({ shipment }) {
               {shipment.sender_city || "Origin"},{" "}
               {shipment.sender_country || ""}
             </p>
-
           </div>
 
           {/* CURRENT */}
           <div className="bg-green-50 rounded-xl p-4">
-
             <p className="text-xs font-semibold text-green-600 uppercase">
               Current Location
             </p>
@@ -439,26 +381,21 @@ function CustomerShipmentMap({ shipment }) {
                 ● Live tracking active
               </p>
             )}
-
           </div>
 
           {/* DESTINATION */}
           <div className="bg-gray-50 rounded-xl p-4">
-
             <p className="text-xs font-semibold text-gray-500 uppercase">
               To
             </p>
 
             <p className="font-semibold text-slate-900 mt-1">
-              {shipment.receiver_city ||
-                "Destination"},{" "}
+              {shipment.receiver_city || "Destination"},{" "}
               {shipment.receiver_country || ""}
             </p>
-
           </div>
 
         </div>
-
       </div>
 
     </div>

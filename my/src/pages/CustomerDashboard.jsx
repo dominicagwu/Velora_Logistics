@@ -25,9 +25,11 @@ function CustomerDashboard() {
 
       if (userError) {
         console.error("User error:", userError);
+
         setErrorMessage(userError.message);
         setShipments([]);
         setLoading(false);
+
         return;
       }
 
@@ -35,7 +37,9 @@ function CustomerDashboard() {
       // CUSTOMER NOT LOGGED IN
       // ==========================================
       if (!currentUser) {
-        sessionStorage.removeItem("customer_tracking_number");
+        sessionStorage.removeItem(
+          "customer_tracking_number"
+        );
 
         navigate("/login", {
           replace: true,
@@ -50,7 +54,9 @@ function CustomerDashboard() {
       // GET VERIFIED TRACKING NUMBER
       // ==========================================
       const trackingNumber =
-        sessionStorage.getItem("customer_tracking_number");
+        sessionStorage.getItem(
+          "customer_tracking_number"
+        );
 
       if (!trackingNumber) {
         setErrorMessage(
@@ -59,13 +65,15 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
+
         return;
       }
 
       // ==========================================
       // CUSTOMER EMAIL
       // ==========================================
-      const customerEmail = currentUser.email?.trim();
+      const customerEmail =
+        currentUser.email?.trim();
 
       if (!customerEmail) {
         setErrorMessage(
@@ -74,6 +82,7 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
+
         return;
       }
 
@@ -90,7 +99,10 @@ function CustomerDashboard() {
         });
 
       if (error) {
-        console.error("Shipment loading error:", error);
+        console.error(
+          "Shipment loading error:",
+          error
+        );
 
         setErrorMessage(
           `Unable to load shipment: ${error.message}`
@@ -98,6 +110,7 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
+
         return;
       }
 
@@ -111,12 +124,16 @@ function CustomerDashboard() {
 
         setShipments([]);
         setLoading(false);
+
         return;
       }
 
       setShipments(data);
     } catch (error) {
-      console.error("Unexpected error:", error);
+      console.error(
+        "Unexpected error:",
+        error
+      );
 
       setErrorMessage(
         error?.message ||
@@ -133,8 +150,12 @@ function CustomerDashboard() {
   // INITIAL LOAD
   // ==========================================
   useEffect(() => {
+  const timer = setTimeout(() => {
     loadShipments();
-  }, [loadShipments]);
+  }, 0);
+
+  return () => clearTimeout(timer);
+}, [loadShipments]);
 
   // ==========================================
   // REAL-TIME SHIPMENT TRACKING
@@ -172,7 +193,8 @@ function CustomerDashboard() {
             payload.new
           );
 
-          const updatedShipment = payload.new;
+          const updatedShipment =
+            payload.new;
 
           // ==========================================
           // SECURITY CHECK
@@ -198,17 +220,20 @@ function CustomerDashboard() {
           }
 
           // ==========================================
-          // UPDATE CUSTOMER DASHBOARD IMMEDIATELY
+          // UPDATE CUSTOMER DASHBOARD
           // ==========================================
-          setShipments((currentShipments) =>
-            currentShipments.map((shipment) =>
-              shipment.id === updatedShipment.id
-                ? {
-                    ...shipment,
-                    ...updatedShipment,
-                  }
-                : shipment
-            )
+          setShipments(
+            (currentShipments) =>
+              currentShipments.map(
+                (shipment) =>
+                  shipment.id ===
+                  updatedShipment.id
+                    ? {
+                        ...shipment,
+                        ...updatedShipment,
+                      }
+                    : shipment
+              )
           );
         }
       )
@@ -229,13 +254,18 @@ function CustomerDashboard() {
 
       supabase.removeChannel(channel);
     };
-  }, [user, shipments.length, shipments[0]?.tracking_number]);
+  }, [
+    user,
+    shipments.length,
+    shipments[0]?.tracking_number,
+  ]);
 
   // ==========================================
   // REFRESH
   // ==========================================
   const handleRefresh = async () => {
     setLoading(true);
+
     await loadShipments();
   };
 
@@ -251,7 +281,10 @@ function CustomerDashboard() {
       await supabase.auth.signOut();
 
     if (error) {
-      console.error("Logout error:", error);
+      console.error(
+        "Logout error:",
+        error
+      );
 
       setErrorMessage(
         `Unable to logout: ${error.message}`

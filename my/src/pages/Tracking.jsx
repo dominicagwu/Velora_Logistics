@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import CustomerShipmentMap from "../Components/CustomerShipmentMap";
 
 function Tracking() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,9 @@ function Tracking() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  // ==========================================
+  // TRACK SHIPMENT
+  // ==========================================
   const handleTrack = async (e) => {
     e.preventDefault();
 
@@ -55,7 +59,11 @@ function Tracking() {
         return;
       }
 
+      // ==========================================
+      // SHIPMENT FOUND
+      // ==========================================
       setShipment(data);
+
     } catch (error) {
       console.error("Unexpected tracking error:", error);
 
@@ -66,6 +74,91 @@ function Tracking() {
       setLoading(false);
     }
   };
+
+  // ==========================================
+  // LIVE SHIPMENT TRACKING
+  // ==========================================
+  useEffect(() => {
+    if (!shipment?.tracking_number) {
+      return;
+    }
+
+    const trackingNumber = shipment.tracking_number;
+
+    console.log(
+      "Starting LIVE tracking for:",
+      trackingNumber
+    );
+
+    const channel = supabase
+      .channel(`tracking-${trackingNumber}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "shipments",
+          filter: `tracking_number=eq.${trackingNumber}`,
+        },
+        (payload) => {
+          console.log(
+            "🔴 LIVE SHIPMENT UPDATE:",
+            payload.new
+          );
+
+          const updatedShipment = payload.new;
+
+          // ==========================================
+          // SECURITY CHECK
+          // ==========================================
+          const updatedEmail =
+            updatedShipment.receiver_email
+              ?.trim()
+              ?.toLowerCase();
+
+          const customerEmail =
+            email
+              ?.trim()
+              ?.toLowerCase();
+
+          if (
+            updatedEmail !== customerEmail
+          ) {
+            console.warn(
+              "Realtime update rejected: customer email mismatch."
+            );
+
+            return;
+          }
+
+          // ==========================================
+          // UPDATE SHIPMENT
+          // ==========================================
+          setShipment((currentShipment) => ({
+            ...currentShipment,
+            ...updatedShipment,
+          }));
+        }
+      )
+      .subscribe((status) => {
+        console.log(
+          "Live tracking connection:",
+          status
+        );
+      });
+
+    // ==========================================
+    // CLEANUP
+    // ==========================================
+    return () => {
+      console.log(
+        "Stopping LIVE tracking for:",
+        trackingNumber
+      );
+
+      supabase.removeChannel(channel);
+    };
+  }, [shipment?.tracking_number, email]);
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-12 sm:py-16">
@@ -160,155 +253,180 @@ function Tracking() {
 
         {/* SHIPMENT RESULT */}
         {shipment && (
-          <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
-
-            {/* TOP */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Tracking Number
-                </p>
-
-                <h2 className="break-all text-xl font-bold text-indigo-600">
-                  {shipment.tracking_number}
-                </h2>
-              </div>
-
-              <span className="w-fit rounded-full bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-700">
-                {shipment.status || "Shipment Created"}
-              </span>
-
-            </div>
+          <div className="mt-8 space-y-8">
 
             {/* SHIPMENT DETAILS */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 
-              {/* SENDER */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Sender
-                </p>
+              {/* TOP */}
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.sender_name || "—"}
-                </p>
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Tracking Number
+                  </p>
+
+                  <h2 className="break-all text-xl font-bold text-indigo-600">
+                    {shipment.tracking_number}
+                  </h2>
+                </div>
+
+                <span className="w-fit rounded-full bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-700">
+                  {shipment.status || "Shipment Created"}
+                </span>
+
               </div>
 
-              {/* RECEIVER */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Receiver
-                </p>
+              {/* SHIPMENT DETAILS */}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.receiver_name || "—"}
-                </p>
+                {/* SENDER */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Sender
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.sender_name || "—"}
+                  </p>
+                </div>
+
+                {/* RECEIVER */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Receiver
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.receiver_name || "—"}
+                  </p>
+                </div>
+
+                {/* ORIGIN */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Origin
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.origin || "—"}
+                  </p>
+                </div>
+
+                {/* DESTINATION */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Destination
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.destination || "—"}
+                  </p>
+                </div>
+
+                {/* CURRENT LOCATION */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Current Location
+                  </p>
+
+                  <div className="mt-1 flex items-center gap-2">
+
+                    <span className="relative flex h-3 w-3">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
+                    </span>
+
+                    <p className="font-medium text-slate-900">
+                      {shipment.location || "—"}
+                    </p>
+
+                  </div>
+
+                  <p className="mt-1 text-xs text-green-600">
+                    ● Live tracking enabled
+                  </p>
+                </div>
+
+                {/* SHIPMENT TYPE */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Shipment Type
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.shipment_type || "—"}
+                  </p>
+                </div>
+
+                {/* SHIPPING DATE */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Shipping Date
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.shipping_date || "—"}
+                  </p>
+                </div>
+
+                {/* EXPECTED DELIVERY */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Expected Delivery
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.expected_delivery || "—"}
+                  </p>
+                </div>
+
+                {/* ESTIMATED TRANSIT */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Estimated Transit
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.estimated_delivery ||
+                      "3–5 Business Days"}
+                  </p>
+                </div>
+
+                {/* PACKAGE DESCRIPTION */}
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Package Description
+                  </p>
+
+                  <p className="mt-1 font-medium text-slate-900">
+                    {shipment.package_description || "—"}
+                  </p>
+                </div>
+
               </div>
 
-              {/* ORIGIN */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Origin
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.origin || "—"}
-                </p>
-              </div>
-
-              {/* DESTINATION */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Destination
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.destination || "—"}
-                </p>
-              </div>
-
-              {/* CURRENT LOCATION */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Current Location
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.location || "—"}
-                </p>
-              </div>
-
-              {/* SHIPMENT TYPE */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Shipment Type
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.shipment_type || "—"}
-                </p>
-              </div>
-
-              {/* SHIPPING DATE */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Shipping Date
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.shipping_date || "—"}
-                </p>
-              </div>
-
-              {/* EXPECTED DELIVERY */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Expected Delivery
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.expected_delivery || "—"}
-                </p>
-              </div>
-
-              {/* ESTIMATED TRANSIT */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Estimated Transit
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.estimated_delivery ||
-                    "3–5 Business Days"}
-                </p>
-              </div>
-
-              {/* PACKAGE DESCRIPTION */}
-              <div>
-                <p className="text-xs text-gray-500">
-                  Package Description
-                </p>
-
-                <p className="mt-1 font-medium text-slate-900">
-                  {shipment.package_description || "—"}
-                </p>
-              </div>
+              {/* TRACK ANOTHER */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShipment(null);
+                  setMessage("");
+                  setTrackingNumber("");
+                }}
+                className="mt-8 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-gray-50"
+              >
+                Track Another Shipment
+              </button>
 
             </div>
 
-            {/* TRACK ANOTHER */}
-            <button
-              type="button"
-              onClick={() => {
-                setShipment(null);
-                setMessage("");
-                setTrackingNumber("");
-              }}
-              className="mt-8 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-gray-50"
-            >
-              Track Another Shipment
-            </button>
+            {/* ==========================================
+                LIVE SHIPMENT MAP
+            ========================================== */}
+            <CustomerShipmentMap
+              shipment={shipment}
+            />
 
           </div>
         )}
